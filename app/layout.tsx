@@ -1,0 +1,116 @@
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import "katex/dist/katex.min.css";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { cn } from "@/lib/utils";
+import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { LayoutWrapper } from "@/components/LayoutWrapper";
+import { Toaster } from "sonner";
+import { FeedbackProvider } from "@/context/FeedbackContext";
+import { FeedbackReminder } from "@/components/FeedbackReminder";
+import JsonLd from "@/components/JsonLd";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { BottomNav } from "@/components/BottomNav";
+import { GlobalDataProvider } from "@/context/GlobalDataContext";
+
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  metadataBase: new URL('https://saraav.in'),
+  title: {
+    default: "Saraav | सराव | SGBAU Exam Prep & Solutions",
+    template: "%s | Saraav"
+  },
+  description: "Ace your SGBAU engineering exams with Saraav. Access previous year questions, expert video solutions, and syllabus tracking.",
+  keywords: ["SGBAU", "Amravati University", "Engineering Exams", "PYQ", "Previous Year Questions", "Exam Prep", "Saraav", "Engineering Solutions"],
+
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      // Prefer logo.jpg if icon.png is not optimal, or stick to icon.png if it's the favicon version. 
+      // User has `icon.png` in public, keeping it.
+      { url: '/icon.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icon.png' },
+    ],
+  },
+
+  openGraph: {
+    title: "Saraav | The Smarter Way to Study for SGBAU",
+    description: "Master your engineering subjects with high-frequency questions, video solutions, and smart tracking.",
+    url: 'https://saraav.in',
+    siteName: 'Saraav',
+    locale: 'en_IN',
+    type: 'website',
+    images: [
+      {
+        url: '/logo.jpg', // Explicitly using logo.jpg as requested for "my logo"
+        width: 1200,
+        height: 630,
+        alt: 'Saraav Logo',
+      }
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Saraav | SGBAU Exam Prep",
+    description: "Don't study blindly. Get the most asked questions and solutions for Amravati University exams.",
+    images: ['/logo.jpg'], // Consistent image
+  }
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
+import { WelcomeModalContainer } from "@/components/WelcomeModalContainer";
+
+// ... existing imports
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className={cn(inter.className, "min-h-screen bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-200 antialiased")}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <FeedbackProvider>
+              <GlobalDataProvider>
+                <JsonLd />
+                <Analytics />
+                <SpeedInsights />
+                <FeedbackReminder />
+                <WelcomeModalContainer />
+                <div className="flex min-h-screen flex-col bg-white dark:bg-black pt-16">
+                  <Navbar />
+                  <LayoutWrapper>
+                    {children}
+                  </LayoutWrapper>
+                  <Footer />
+                  <BottomNav />
+                  <Toaster richColors position="top-center" />
+                </div>
+              </GlobalDataProvider>
+            </FeedbackProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
