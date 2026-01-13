@@ -221,14 +221,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         // Detect Mobile Device
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        // Including 'Mobile' covers many browsers on mobile devices that don't explicitly say Android/iPhone (e.g. some Firefox builds or generic webviews)
+        const isMobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent);
 
         if (isMobile) {
             console.log("[Auth] Starting mobile redirect login...");
             await signInWithRedirect(auth, provider);
         } else {
             console.log("[Auth] Starting desktop popup login...");
-            await signInWithPopup(auth, provider);
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error: any) {
+                console.warn("[Auth] Popup login failed, attempting fallback to redirect...", error.code);
+                // Fallback to redirect if popup is blocked or cancelled (often happens on mobile-like desktop views or strict browsers)
+                if (error.code === 'auth/cancelled-popup-request' ||
+                    error.code === 'auth/popup-blocked' ||
+                    error.code === 'auth/popup-closed-by-user') {
+                    await signInWithRedirect(auth, provider);
+                } else {
+                    throw error;
+                }
+            }
         }
     };
 

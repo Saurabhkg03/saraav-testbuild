@@ -329,7 +329,7 @@ export default function SemesterBundlePage() {
                             <div className="mt-8">
                                 {isFullyOwned ? (
                                     <Link
-                                        href={`/courses?bundle=${encodeURIComponent(`${branch}-${semester}`)}`}
+                                        href={`/courses?bundle=${encodeURIComponent(bundleId)}`}
                                         className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-8 py-4 text-base font-semibold text-white shadow-lg transition-all hover:bg-green-700 hover:shadow-xl"
                                     >
                                         <BookOpen className="h-5 w-5" />
@@ -371,7 +371,7 @@ export default function SemesterBundlePage() {
                     <div className="flex-1">
                         {isFullyOwned ? (
                             <Link
-                                href={`/courses?bundle=${encodeURIComponent(`${branch}-${semester}`)}`}
+                                href={`/courses?bundle=${encodeURIComponent(bundleId)}`}
                                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:bg-green-700"
                             >
                                 <BookOpen className="h-4 w-4" />
