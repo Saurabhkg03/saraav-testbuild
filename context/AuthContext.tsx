@@ -86,20 +86,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         let unsubscribe: () => void;
 
         const initializeAuth = async () => {
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-            if (isMobile) {
-                try {
-                    // On mobile, check for redirect result FIRST before listening to auth state
-                    const result = await getRedirectResult(auth);
-                    if (result) {
-                        console.log("[Auth] Redirect login successful:", result.user.uid);
-                    }
-                } catch (error: any) {
-                    console.error("Error confirming redirect login", error);
-                    if (error.code !== 'auth/popup-closed-by-user') {
-                        toast.error("Login failed: " + error.message);
-                    }
+            // Check for redirect result on ALL devices to catch any pending redirect operations
+            try {
+                const result = await getRedirectResult(auth);
+                if (result) {
+                    console.log("[Auth] Redirect login successful:", result.user.uid);
+                    toast.success("Successfully logged in!");
+                }
+            } catch (error: any) {
+                console.error("Error confirming redirect login", error);
+                if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/null-user') {
+                    // Suppress common non-errors
+                    toast.error("Login failed: " + error.message);
                 }
             }
 

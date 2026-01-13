@@ -24,7 +24,7 @@ export default function LoginPage() {
         setIsLoggingIn(true);
         try {
             await login();
-            toast.success("Welcome back!");
+            // Success toast handled in AuthContext or implied by redirect
         } catch (error: any) {
             toast.error("Login failed: " + error.message);
             setIsLoggingIn(false);
