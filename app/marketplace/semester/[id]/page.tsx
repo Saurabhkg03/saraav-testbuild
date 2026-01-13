@@ -42,7 +42,7 @@ export default function SemesterBundlePage() {
                 const db = getFirestore();
 
                 // Special handling for synthetic 1st Year bundles
-                if (bundleId === 'FirstYear-GroupA' || bundleId === 'FirstYear-GroupB') {
+                if (bundleId === 'FirstYear-GroupA' || bundleId === 'FirstYear-GroupB' || bundleId === 'FirstYear-General') {
                     // Fetch all 1st year subjects
                     // We need subjects from Sem 1, Sem 2, or First Year
                     // OR just fetch all and filter client side if the dataset is small (subjects_metadata)
@@ -57,13 +57,22 @@ export default function SemesterBundlePage() {
                     const snap = await getDocs(q);
                     const allFirstYear = snap.docs.map(d => ({ id: d.id, ...d.data() } as SubjectMetadata));
 
-                    const targetGroup = bundleId === 'FirstYear-GroupA' ? 'A' : 'B';
+                    let targetGroup = null;
+                    if (bundleId === 'FirstYear-GroupA') targetGroup = 'A';
+                    else if (bundleId === 'FirstYear-GroupB') targetGroup = 'B';
 
-                    const validSubjects = allFirstYear.filter(s => s.group === targetGroup || s.isCommon);
+                    const validSubjects = allFirstYear.filter(s => {
+                        if (targetGroup) {
+                            return s.group === targetGroup || s.isCommon;
+                        } else {
+                            // General: Not A, Not B, Not Common
+                            return s.group !== 'A' && s.group !== 'B' && !s.isCommon;
+                        }
+                    });
 
                     if (validSubjects.length > 0) {
                         setBundleData({
-                            branch: `First Year - Group ${targetGroup}`,
+                            branch: targetGroup ? `First Year - Group ${targetGroup}` : 'First Year',
                             semester: 'First Year',
                             subjects: validSubjects
                         });
